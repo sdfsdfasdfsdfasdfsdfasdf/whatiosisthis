@@ -153,6 +153,7 @@ const pool = [
   { image: "images/ios16.png", ios: 16 }
 ];
 
+let lastIOS = null;
 let current;
 let score = 0;
 let best = localStorage.getItem("bestScore") || 0;
@@ -166,12 +167,21 @@ const bestEl = document.getElementById("best");
 bestEl.textContent = best;
 
 function newRound() {
-  current = pool[Math.floor(Math.random() * pool.length)];
+  let next;
+
+  do {
+    next = pool[Math.floor(Math.random() * pool.length)];
+  } while (next.ios === lastIOS);
+
+  current = next;
+  lastIOS = current.ios;
+
   img.src = current.image;
   input.value = "";
   feedback.textContent = "";
   input.focus();
 }
+
 
 function submitGuess() {
   const guess = Number(input.value);
