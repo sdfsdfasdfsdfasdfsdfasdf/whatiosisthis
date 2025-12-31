@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>What iOS Is This?</title>
+
+<style>
+:root {
+  --bg: #0b1020;
+  --card: #121833;
+  --accent: #3b82f6;
+  --good: #22c55e;
+  --bad: #ef4444;
+  --text: #e5e7eb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  background: radial-gradient(circle at top, #111827, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game {
+  background: var(--card);
+  padding: 24px;
+  border-radius: 20px;
+  width: 360px;
+  max-width: 90vw;
+  text-align: center;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+}
+
+h1 {
+  margin-top: 0;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+img {
+  width: 100%;
+  border-radius: 14px;
+  margin: 16px 0;
+  border: 1px solid #1f2937;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  font-size: 18px;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  text-align: center;
+  background: #020617;
+  color: white;
+}
+
+button {
+  width: 100%;
+  margin-top: 10px;
+  padding: 14px;
+  font-size: 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+#feedback {
+  margin-top: 12px;
+  font-size: 18px;
+  min-height: 24px;
+}
+
+.scoreboard {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+.correct {
+  color: var(--good);
+}
+
+.wrong {
+  color: var(--bad);
+}
+
+.fade {
+  animation: fade 0.3s ease;
+}
+
+@keyframes fade {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game fade">
+  <h1>📱 What iOS Is This?</h1>
+
+  <img id="iosImage" src="" alt="iOS screenshot">
+
+  <input
+    id="guessInput"
+    type="number"
+    placeholder="Type iOS version (e.g. 6, 12, 17)"
+  >
+
+  <button onclick="submitGuess()">Guess</button>
+
+  <div id="feedback"></div>
+
+  <div class="scoreboard">
+    <div>Score: <span id="score">0</span></div>
+    <div>Best: <span id="best">0</span></div>
+  </div>
+</div>
+
+<script>
+const pool = [
+  { image: "images/ios5.png", ios: 5 },
+  { image: "images/ios6.png", ios: 6 },
+  { image: "images/ios7.png", ios: 7 },
+  { image: "images/ios9.png", ios: 9 },
+  { image: "images/ios10.png", ios: 10 },
+  { image: "images/ios12.png", ios: 12 },
+  { image: "images/ios14.png", ios: 14 },
+  { image: "images/ios16.png", ios: 16 }
+];
+
+let current;
+let score = 0;
+let best = localStorage.getItem("bestScore") || 0;
+
+const img = document.getElementById("iosImage");
+const input = document.getElementById("guessInput");
+const feedback = document.getElementById("feedback");
+const scoreEl = document.getElementById("score");
+const bestEl = document.getElementById("best");
+
+bestEl.textContent = best;
+
+function newRound() {
+  current = pool[Math.floor(Math.random() * pool.length)];
+  img.src = current.image;
+  input.value = "";
+  feedback.textContent = "";
+  input.focus();
+}
+
+function submitGuess() {
+  const guess = Number(input.value);
+
+  if (!guess) return;
+
+  if (guess === current.ios) {
+    score++;
+    feedback.textContent = "✅ Correct!";
+    feedback.className = "correct";
+  } else {
+    feedback.textContent = `❌ Wrong — it was iOS ${current.ios}`;
+    feedback.className = "wrong";
+    score = 0;
+  }
+
+  if (score > best) {
+    best = score;
+    localStorage.setItem("bestScore", best);
+  }
+
+  scoreEl.textContent = score;
+  bestEl.textContent = best;
+
+  setTimeout(newRound, 900);
+}
+
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") submitGuess();
+});
+
+newRound();
+</script>
+
+</body>
+</html>
